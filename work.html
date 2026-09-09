@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Work — Traffic Engineering</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --void:#111111;
+    --panel:#1a1a1a;
+    --panel-2:#161616;
+    --line: rgba(255,255,255,.08);
+    --line-strong: rgba(255,255,255,.16);
+    --text: #f2f1ee;
+    --text-dim: #9a9a9a;
+    --text-faint: #6b6b6b;
+    --red: #780606;
+    --red-bright: #a30d0d;
+    --red-tint: rgba(120,6,6,.14);
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    background: #111111;
+    overflow-x:hidden;
+    margin:0;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .background-texture {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle, rgba(255,255,255,.015) 1px, transparent 1px);
+    background-size: 8px 8px;
+    opacity: .5;
+    pointer-events: none;
+  }
+  .background{
+    position:fixed;
+    inset:0;
+    z-index:-5;
+    pointer-events:none;
+    overflow:hidden;
+  }
+  .background-scroll{
+    position:absolute;
+    inset:0px;
+  }
+
+  .back-btn{
+    position: fixed;
+    top: 22px;
+    left: 22px;
+    z-index: 50;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: .85rem;
+    letter-spacing:.02em;
+    color: var(--text-dim);
+    background: rgba(17,17,17,.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line-strong);
+    padding: 9px 14px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .back-btn:hover, .back-btn:focus-visible{
+    color: #fff;
+    border-color: var(--red);
+    background: var(--red-tint);
+  }
+  .back-btn span{ color: var(--red); }
+
+  .to-top{
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    z-index: 50;
+    width: 46px;
+    height: 46px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: rgba(17,17,17,.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    color: var(--text-dim);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease, color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .to-top.visible{
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .to-top:hover, .to-top:focus-visible{
+    color:#fff;
+    border-color: var(--red);
+    background: var(--red-tint);
+  }
+  .to-top svg{ width:18px; height:18px; }
+
+  a:focus-visible, button:focus-visible{
+    outline: 2px solid var(--red);
+    outline-offset: 2px;
+  }
+
+  main{
+    position:relative;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 120px 32px 100px;
+  }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: .78rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .eyebrow span{ color: var(--red); }
+
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: clamp(2.1rem, 4.2vw, 3.1rem);
+    margin: 18px 0 20px;
+    letter-spacing: -.01em;
+  }
+
+  .lede{
+    max-width: 640px;
+    color: var(--text-dim);
+    font-size: 1.02rem;
+    line-height: 1.65;
+    margin: 0 0 28px;
+  }
+
+  .laneline{
+    width: 100%;
+    height: 1px;
+    background-image: repeating-linear-gradient(
+      to right,
+      var(--line-strong) 0px, var(--line-strong) 22px,
+      transparent 22px, transparent 40px
+    );
+    margin: 0 0 26px;
+  }
+
+  .disclaimer{
+    max-width: 640px;
+    color: var(--text-faint);
+    font-size: .88rem;
+    font-style: italic;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+
+  .projects-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 26px;
+    margin-top: 56px;
+  }
+
+  .project-card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+    display:flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity .6s ease, transform .35s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  .project-card.in-view{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .project-card:hover{
+    transform: translateY(-4px);
+    border-color: rgba(120,6,6,.55);
+    box-shadow: 0 16px 34px rgba(0,0,0,.45);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  .project-image{
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background-color: var(--panel-2);
+    background-size: cover;
+    background-position: center;
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+    transition: transform .5s ease;
+  }
+  .project-card:hover .project-image{
+    transform: scale(1.035);
+  }
+  .project-image::before, .project-image::after{
+    content:"";
+    position:absolute;
+    width: 14px;
+    height: 14px;
+    opacity: .55;
+    pointer-events:none;
+  }
+
+  .image-fallback{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size: .72rem;
+    color: var(--text-faint);
+    opacity: .5;
+    pointer-events:none;
+    text-align:center;
+    padding: 0 12px;
+  }
+
+.project-image{
+    position:relative;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+}
+
+.project-image img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    filter:brightness(.82);
+}
+
+
+.project-marker{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:28px;
+    height:28px;
+    transform:translate(-50%,-100%);
+    background:var(--amber);
+    border:4px solid #fff;
+    border-radius:50%;
+    box-shadow:
+        0 0 0 3px rgba(255,255,255,.15),
+        0 8px 20px rgba(0,0,0,.45);
+}
+
+
+.project-marker::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    bottom:-12px;
+    width:12px;
+    height:12px;
+    background:var(--amber);
+    transform:translateX(-50%) rotate(45deg);
+    border-right:4px solid #f2e8e8;
+    border-bottom:4px solid #780606;
+}
+
+
+.project-marker::before{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:8px;
+    height:8px;
+    transform:translate(-50%,-50%);
+    background:#780606;
+    border-radius:50%;
+}
+
+.project-credit{
+    position:absolute;
+    right:10px;
+    bottom:8px;
+    font-size:.58rem;
+    color:rgba(255,255,255,.55);
+    text-shadow:0 1px 2px rgba(0,0,0,.6);
+    pointer-events:none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .project-body{
+    padding: 20px 22px 22px;
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+    flex:1;
+  }
+
+  .project-location{
+    display:inline-flex;
+    align-items:center;
+    gap: 5px;
+    width: fit-content;
+    font-family:'JetBrains Mono', monospace;
+    font-size: .72rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--red-bright);
+    text-decoration: none;
+    transition: color .2s ease;
+  }
+  .project-location:hover, .project-location:focus-visible{
+    color: #fff;
+  }
+  .project-location:hover b, .project-location:focus-visible b{
+    color: var(--text);
+  }
+  .project-location b{
+    color: var(--text-dim);
+    font-weight:500;
+    transition: color .2s ease;
+  }
+  .project-location svg{
+    width: 11px;
+    height: 11px;
+    flex-shrink: 0;
+  }
+
+  .project-title{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 1.14rem;
+    margin: 0;
+    letter-spacing: -.005em;
+  }
+
+  .project-desc{
+    color: var(--text-dim);
+    font-size: .92rem;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .tag-row{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 6px;
+  }
+
+  .tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size: .66rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #c7c7c7;
+    background: var(--panel-2);
+    border-left: 2px solid var(--red);
+    padding: 5px 9px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+
+  footer{
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: .74rem;
+    color: var(--text-faint);
+    letter-spacing:.03em;
+  }
+
+  @media (max-width: 640px){
+    main{ padding: 100px 20px 80px; }
+    .back-btn{ top:16px; left:16px; padding:8px 12px; font-size:.78rem; }
+    .to-top{ bottom:16px; right:16px; width:42px; height:42px; }
+    footer{ flex-direction:column; align-items:flex-start; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; animation:none !important; }
+    .project-card{ opacity:1 !important; transform:none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="background">
+    <div class="background-scroll"></div>
+    <div class="background-texture"></div>
+  </div>
+
+  <a href="index.html#traffic-engineering" class="back-btn" aria-label="Back to main site" title="Back to main site"><span>../</span></a>
+
+  <button class="to-top" aria-label="Scroll to top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="19" x2="12" y2="5"></line>
+      <polyline points="5 12 12 5 19 12"></polyline>
+    </svg>
+  </button>
+
+  <main>
+
+    <div class="eyebrow">Traffic Engineering <span>/</span> Work</div>
+    <h1>Selected Projects</h1>
+    <p class="lede">
+      During my time as a traffic engineer, our team used to deliver more than 400 projects a year across New South Wales and I had a hand in a good number of them, across a wide range of work, including but not limited to:
+    </p>
+    
+
+      <ul class="lede">
+      <li>Traffic and parking impact studies</li>
+      <li>Traffic modelling</li>
+      <li>Swept Path Assessments</li>
+      <li>Compliance Reviews</li>
+      <li>Mechanical car stacker, car lift, and car turntable design</li>
+      <li>Access design</li>
+      <li>Construction Certification and Occupation Certification</li>
+      <li>Signage and line marking design</li>
+      <li>Car parking and loading dock facilities design</li>
+      <li>Traffic control plans / traffic guidance schemes</li>
+      <li>Construction traffic management plans</li>
+      <li>Green travel plans</li>
+      <li>Transport access guides</li>
+      <li>Car park management plans</li>
+      <li>Loading dock management plans</li>
+      </ul>
+
+    <p class="lede">
+      The picks below is just a small sample pulled from that longer list.
+    </p>
+
+    <div class="laneline"></div>
+
+    <p class="disclaimer">
+      <b>Note:</b> Every project below was delivered as part of the traffic engineering team at
+      Transurban Consulting Engineers | none of this was a solo effort, and credit is
+      shared with the colleagues I worked alongside on each site.
+    </p>
+
+    <section class="projects-grid">
+
+      <!-- PROJECT CARD 1 -->
+      <article class="project-card">
+        <div class="project-image">
+
+            <img
+                src="https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/150.9471368605327,-33.93823481839279,17.5/1280x720@2x?access_token=pk.eyJ1Ijoic2hhYWlyOTIxMSIsImEiOiJjbXR1a3B2YncwamljMnlyMXo4ZzluZGl0In0.FUUtn96hw7NpsP2u-l_NPA"
+                alt="Project location">
+
+            <div class="project-marker"></div>
+
+            <div class="project-credit">
+                Map imagery © Mapbox · Data © OpenStreetMap contributors
+            </div>
+
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="https://maps.app.goo.gl/JwuL5R6wprXC7oH2A" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Moorebank <b>/ NSW</b>
+          </a>
+          <h3 class="project-title">51 Junction Road, Moorebank</h3>
+          <p class="project-desc">A public recreation facility on Council-zoned land (RE1 – Public Recreation), assessed for its traffic and parking impact on the surrounding street network.</p>
+          <!-- <div class="tag-row">
+            <span class="tag">TIA</span>
+            <span class="tag">SIDRA Modelling</span>
+            <span class="tag">TGS</span>
+          </div> -->
+        </div>
+      </article>
+
+      <!-- PROJECT CARD 2 -->
+      <article class="project-card">
+        <div class="project-image">
+
+            <img
+                src="https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/150.81867156340053,-33.95004704455439,17.5/1280x720@2x?access_token=pk.eyJ1Ijoic2hhYWlyOTIxMSIsImEiOiJjbXR1a3B2YncwamljMnlyMXo4ZzluZGl0In0.FUUtn96hw7NpsP2u-l_NPA"
+                alt="Project location">
+
+            <div class="project-marker"></div>
+
+            <div class="project-credit">
+                Map imagery © Mapbox · Data © OpenStreetMap contributors
+            </div>
+
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="https://maps.app.goo.gl/BhmYnx3ni22byekJA" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Austral <b>/ NSW</b>
+          </a>
+          <h3 class="project-title">250-260 Bringelly Road, Austral</h3>
+          <p class="project-desc">Swept path analysis, traffic guidance scheme, traffic impact assessment, and construction traffic management for a development in Austral, along with Council correspondence.</p>
+          <!-- <div class="tag-row">
+            <span class="tag">CTMP</span>
+            <span class="tag">SP</span>
+            <span class="tag">TGS</span>
+          </div> -->
+        </div>
+      </article>
+
+      <!-- PROJECT CARD 3 -->
+      <article class="project-card">
+        <div class="project-image">
+            <img
+                src="https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/151.26985947404475,-33.870557962203705,17.5/1280x720@2x?access_token=pk.eyJ1Ijoic2hhYWlyOTIxMSIsImEiOiJjbXR1a3B2YncwamljMnlyMXo4ZzluZGl0In0.FUUtn96hw7NpsP2u-l_NPA"
+                alt="Project location">
+            <div class="project-marker"></div>
+            <div class="project-credit">
+                Map imagery © Mapbox · Data © OpenStreetMap contributors
+            </div>
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="https://maps.app.goo.gl/GwTGqnDfEWYi2kwS7" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Rose Bay <b>/ NSW</b>
+          </a>
+          <h3 class="project-title">17 Dover Road, Rose Bay</h3>
+          <p class="project-desc">Construction traffic management for a mixed-use development in Rose Bay, including swept path and vertical clearance analysis, and certification for construction.</p>
+          <!-- <div class="tag-row">
+            <span class="tag">TIA</span>
+            <span class="tag">CTMP</span>
+          </div> -->
+        </div>
+      </article>
+
+      <!-- PROJECT CARD 4 -->
+      <article class="project-card">
+        <div class="project-image">
+            <img
+                src="https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/150.79653214399758,-33.97518152362953,17.5/1280x720@2x?access_token=pk.eyJ1Ijoic2hhYWlyOTIxMSIsImEiOiJjbXR1a3B2YncwamljMnlyMXo4ZzluZGl0In0.FUUtn96hw7NpsP2u-l_NPA"
+                alt="Project location">
+            <div class="project-marker"></div>
+            <div class="project-credit">
+                Map imagery © Mapbox · Data © OpenStreetMap contributors
+            </div>
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="https://maps.app.goo.gl/vbTp11e1FKVeBH9B7" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Leppington <b>/ NSW</b>
+          </a>
+          <h3 class="project-title">125 Ridge Square, Leppington</h3>
+          <p class="project-desc">Traffic impact assessment and SIDRA modelling for a new childcare centre in Leppington, including swept path analysis and RFI responses.</p>
+          <!-- <div class="tag-row">
+            <span class="tag">SIDRA Modelling</span>
+            <span class="tag">SP</span>
+          </div> -->
+        </div>
+      </article>
+
+      <!-- PROJECT CARD 5 -->
+      <article class="project-card">
+        <div class="project-image">
+            <img
+                src="https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/150.92175059426262,-33.90793067600212,17.5/1280x720@2x?access_token=pk.eyJ1Ijoic2hhYWlyOTIxMSIsImEiOiJjbXR1a3B2YncwamljMnlyMXo4ZzluZGl0In0.FUUtn96hw7NpsP2u-l_NPA"
+                alt="Project location">
+            <div class="project-marker"></div>
+            <div class="project-credit">
+                Map imagery © Mapbox · Data © OpenStreetMap contributors
+            </div>
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="https://maps.app.goo.gl/A6LWmu2MAd6attvN8" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Warwick Farm <b>/ NSW</b>
+          </a>
+          <h3 class="project-title">5 Viscount Place, Warwick Farm</h3>
+          <p class="project-desc">A retail/commercial development in Warwick Farm, covering a parking statement and Operational Traffic Management Plan for the site.</p>
+          <!-- <div class="tag-row">
+            <span class="tag">TGS</span>
+            <span class="tag">TIA</span>
+            <span class="tag">CTMP</span>
+          </div> -->
+        </div>
+      </article>
+
+      <!-- PROJECT CARD 6 -->
+      <article class="project-card">
+        <div class="project-image">
+          <img
+            src="https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/150.9498367807718,-33.948110472809965,17.5/1280x720@2x?access_token=pk.eyJ1Ijoic2hhYWlyOTIxMSIsImEiOiJjbXR1a3B2YncwamljMnlyMXo4ZzluZGl0In0.FUUtn96hw7NpsP2u-l_NPA"
+            alt="Project location">
+          <div class="project-marker"></div>
+          <div class="project-credit">
+            Map imagery © Mapbox · Data © OpenStreetMap contributors
+          </div>
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="https://maps.app.goo.gl/c8U3oa3nGNYTiX5v7" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Hammondville <b>/ NSW</b>
+          </a>
+          <h3 class="project-title">182 Heathcote Road, Hammondville</h3>
+          <p class="project-desc">A Torrens title residential subdivision in Hammondville, covering swept path analysis, a traffic guidance scheme, and construction traffic management, along with certification and an RFI response to Council.</p>
+          <!-- <div class="tag-row">
+            <span class="tag">SP</span>
+            <span class="tag">SIDRA Modelling</span>
+          </div> -->
+        </div>
+      </article>
+
+      <!-- PROJECT CARD 7 -->
+      <article class="project-card">
+        <div class="project-image">
+          <img
+            src="https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/150.90645999610095,-33.6283250066371,17.5/1280x720@2x?access_token=pk.eyJ1Ijoic2hhYWlyOTIxMSIsImEiOiJjbXR1a3B2YncwamljMnlyMXo4ZzluZGl0In0.FUUtn96hw7NpsP2u-l_NPA"
+            alt="Project location">
+          <div class="project-marker"></div>
+          <div class="project-credit">
+            Map imagery © Mapbox · Data © OpenStreetMap contributors
+          </div>
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="https://maps.app.goo.gl/DfttsaCmV6GHUpiaA" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Gables <b>/ NSW</b>
+          </a>
+          <h3 class="project-title">1 Pennant Way, Gables</h3>
+          <p class="project-desc">An educational facility development in Gables, covering a broad scope of traffic planning and construction management work.</p>
+          <!-- <div class="tag-row">
+            <span class="tag">TIA</span>
+            <span class="tag">TGS</span>
+          </div> -->
+        </div>
+      </article>
+
+      <!-- PROJECT CARD 8 -->
+      <article class="project-card">
+        <div class="project-image">
+          <img
+            src="https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/150.84975099610963,-33.82255108928906,17.5/1280x720@2x?access_token=pk.eyJ1Ijoic2hhYWlyOTIxMSIsImEiOiJjbXR1a3B2YncwamljMnlyMXo4ZzluZGl0In0.FUUtn96hw7NpsP2u-l_NPA"
+            alt="Project location">
+          <div class="project-marker"></div>
+          <div class="project-credit">
+            Map imagery © Mapbox · Data © OpenStreetMap contributors
+          </div>
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="https://maps.app.goo.gl/ggQnyqtgEFPk5X3S9" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Eastern Creek <b>/ NSW</b>
+          </a>
+          <h3 class="project-title">813-913 Wallgrove Road, Eastern Creek</h3>
+          <p class="project-desc">An industrial development in Eastern Creek, covering swept path analysis, operational traffic management, and a traffic statement, along with Council correspondence.</p>
+          <!-- <div class="tag-row">
+            <span class="tag">CTMP</span>
+            <span class="tag">SIDRA Modelling</span>
+            <span class="tag">SP</span>
+          </div> -->
+        </div>
+      </article>
+
+      <!-- PROJECT CARD 9 -->
+      <article class="project-card">
+        <div class="project-image">
+          <img
+            src="https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/151.02024067193446,-33.64259297509762,17.5/1280x720@2x?access_token=pk.eyJ1Ijoic2hhYWlyOTIxMSIsImEiOiJjbXR1a3B2YncwamljMnlyMXo4ZzluZGl0In0.FUUtn96hw7NpsP2u-l_NPA"
+            alt="Project location">
+          <div class="project-marker"></div>
+          <div class="project-credit">
+            Map imagery © Mapbox · Data © OpenStreetMap contributors
+          </div>
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="https://maps.app.goo.gl/NKRtvNSpYuB8Zn499" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Middle Dural <b>/ NSW</b>
+          </a>
+          <h3 class="project-title">788 & 790 Old Northern Road, Middle Dural</h3>
+          <p class="project-desc">A cemetery development in Middle Dural, covering swept path analysis, a traffic guidance scheme, SIDRA modelling, a traffic impact assessment, and Council correspondence.</p>
+          <!-- <div class="tag-row">
+            <span class="tag">TGS</span>
+            <span class="tag">CTMP</span>
+            <span class="tag">SIDRA Modelling</span>
+          </div> -->
+        </div>
+      </article>
+
+      <!-- PROJECT CARD 10 -->
+      <article class="project-card">
+        <div class="project-image">
+          <img
+            src="https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/151.2249713004103,-33.87133181658831,17.5/1280x720@2x?access_token=pk.eyJ1Ijoic2hhYWlyOTIxMSIsImEiOiJjbXR1a3B2YncwamljMnlyMXo4ZzluZGl0In0.FUUtn96hw7NpsP2u-l_NPA"
+            alt="Project location">
+          <div class="project-marker"></div>
+          <div class="project-credit">
+            Map imagery © Mapbox · Data © OpenStreetMap contributors
+          </div>
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="https://maps.app.goo.gl/5hRWKeDSVrmLaRWu9" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Potts Point <b>/ NSW</b>
+          </a>
+          <h3 class="project-title">91-93 Macleay Street, Potts Point</h3>
+          <p class="project-desc">A mixed-use development in Potts Point, covering traffic modelling, impact assessment, construction and operational traffic management, and a green travel plan.</p>
+          <!-- <div class="tag-row">
+            <span class="tag">TGS</span>
+            <span class="tag">CTMP</span>
+            <span class="tag">SIDRA Modelling</span>
+          </div> -->
+        </div>
+      </article>
+
+          <!-- PROJECT CARD 11 -->
+      <article class="project-card">
+        <div class="project-image">
+          <img
+            src="https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/150.9937705961189,-33.75239678181108,17.5/1280x720@2x?access_token=pk.eyJ1Ijoic2hhYWlyOTIxMSIsImEiOiJjbXR1a3B2YncwamljMnlyMXo4ZzluZGl0In0.FUUtn96hw7NpsP2u-l_NPA"
+            alt="Project location">
+          <div class="project-marker"></div>
+          <div class="project-credit">
+            Map imagery © Mapbox · Data © OpenStreetMap contributors
+          </div>
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="https://maps.app.goo.gl/RrAsWPQsTNT34Hty8" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Baulkham Hills <b>/ NSW</b>
+            </a>
+            <h3 class="project-title">120 Old Northern Road, Baulkham Hills</h3>
+          <p class="project-desc">A medical centre development in Baulkham Hills, covering swept path analysis and a traffic impact assessment.</p>
+          <!-- <div class="tag-row">
+            <span class="tag">TGS</span>
+            <span class="tag">CTMP</span>
+            <span class="tag">SIDRA Modelling</span>
+          </div> -->
+        </div>
+      </article>
+
+            <!-- PROJECT CARD 12 -->
+      <article class="project-card">
+        <div class="project-image">
+          <img
+            src="https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/151.2620167359879,-33.76783499789233,17.5/1280x720@2x?access_token=pk.eyJ1Ijoic2hhYWlyOTIxMSIsImEiOiJjbXR1a3B2YncwamljMnlyMXo4ZzluZGl0In0.FUUtn96hw7NpsP2u-l_NPA"
+            alt="Project location">
+          <div class="project-marker"></div>
+          <div class="project-credit">
+            Map imagery © Mapbox · Data © OpenStreetMap contributors
+          </div>
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="https://maps.app.goo.gl/zTcT9aa18mSL6Kja7" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Brookvale <b>/ NSW</b>
+          </a>
+          <h3 class="project-title">144 Old Pittwater Road, Brookvale</h3>
+          <p class="project-desc">Swept path analysis and a traffic impact assessment for a recreational facility development in Brookvale.</p>
+          <!-- <div class="tag-row">
+            <span class="tag">TGS</span>
+            <span class="tag">CTMP</span>
+            <span class="tag">SIDRA Modelling</span>
+          </div> -->
+        </div>
+      </article>
+
+            <!-- PROJECT CARD 13 -->
+      <article class="project-card">
+        <div class="project-image">
+          <img
+            src="https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/150.33132593843305,-33.71377912649882,17.5/1280x720@2x?access_token=pk.eyJ1Ijoic2hhYWlyOTIxMSIsImEiOiJjbXR1a3B2YncwamljMnlyMXo4ZzluZGl0In0.FUUtn96hw7NpsP2u-l_NPA"
+            alt="Project location">
+          <div class="project-marker"></div>
+          <div class="project-credit">
+            Map imagery © Mapbox · Data © OpenStreetMap contributors
+          </div>
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="https://maps.app.goo.gl/5RUB382THC5ARdco6" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Leura <b>/ NSW</b>
+          </a>
+          <h3 class="project-title">170-174 Leura Mall, Leura</h3>
+          <p class="project-desc">Construction traffic management for a commercial development in Leura.</p>
+          <!-- <div class="tag-row">
+            <span class="tag">TGS</span>
+            <span class="tag">CTMP</span>
+            <span class="tag">SIDRA Modelling</span>
+          </div> -->
+        </div>
+      </article>
+
+            <!-- PROJECT CARD 14 -->
+      <article class="project-card">
+        <div class="project-image">
+          <img
+            src="https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/150.80472665748817,-33.93387744287079,17.5/1280x720@2x?access_token=pk.eyJ1Ijoic2hhYWlyOTIxMSIsImEiOiJjbXR1a3B2YncwamljMnlyMXo4ZzluZGl0In0.FUUtn96hw7NpsP2u-l_NPA"
+            alt="Project location">
+          <div class="project-marker"></div>
+          <div class="project-credit">
+            Map imagery © Mapbox · Data © OpenStreetMap contributors
+          </div>
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="https://maps.app.goo.gl/Uw9XgkNAu1J2tqyw5" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Austral <b>/ NSW</b>
+          </a>
+          <h3 class="project-title">145 Ninth Avenue, Austral</h3>
+          <p class="project-desc">Swept path analysis and a traffic and parking impact assessment for a recreation centre development in Austral.</p>
+          <!-- <div class="tag-row">
+            <span class="tag">TGS</span>
+            <span class="tag">CTMP</span>
+            <span class="tag">SIDRA Modelling</span>
+          </div> -->
+        </div>
+      </article>
+
+            <!-- PROJECT CARD 15 -->
+      <!-- <article class="project-card">
+        <div class="project-image" style="background-image:url('images/project-9.jpg')">
+          <span class="image-fallback">images/project-9.jpg</span>
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="#" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            [Suburb] <b>/ NSW</b>
+          </a>
+          <h3 class="project-title">2 Percy Street, Auburn</h3>
+          <p class="project-desc">No Land use</p>
+          <div class="tag-row">
+            <span class="tag">TGS</span>
+            <span class="tag">CTMP</span>
+            <span class="tag">SIDRA Modelling</span>
+          </div>
+        </div>
+      </article> -->
+
+            <!-- PROJECT CARD 16 -->
+      <article class="project-card">
+        <div class="project-image">
+          <img
+            src="https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/150.97237010960214,-33.823895561366555,17.5/1280x720@2x?access_token=pk.eyJ1Ijoic2hhYWlyOTIxMSIsImEiOiJjbXR1a3B2YncwamljMnlyMXo4ZzluZGl0In0.FUUtn96hw7NpsP2u-l_NPA"
+            alt="Project location">
+          <div class="project-marker"></div>
+          <div class="project-credit">
+            Map imagery © Mapbox · Data © OpenStreetMap contributors
+          </div>
+        </div>
+        <div class="project-body">
+          <a class="project-location" href="https://maps.app.goo.gl/2ZGuno3Dgp1wnDpg7" target="_blank" rel="noopener noreferrer" aria-label="View [Suburb] on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.686-7-11a7 7 0 0 1 14 0c0 5.314-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Merrylands <b>/ NSW</b>
+          </a>
+          <h3 class="project-title">4 Lewis Street, Merrylands</h3>
+          <p class="project-desc">A dual occupancy development with Torrens title subdivision in Merrylands, covering construction traffic management, swept path analysis, and a traffic guidance scheme.</p>
+          <!-- <div class="tag-row">
+            <span class="tag">TGS</span>
+            <span class="tag">CTMP</span>
+            <span class="tag">SIDRA Modelling</span>
+          </div> -->
+        </div>
+      </article>
+
+
+
+    </section>
+
+    <footer>
+      <span>New South Wales, Australia</span>
+      <span>Transurban Consulting Engineers</span>
+    </footer>
+  </main>
+
+<script>
+  const toTopBtn = document.querySelector('.to-top');
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 420) {
+      toTopBtn.classList.add('visible');
+    } else {
+      toTopBtn.classList.remove('visible');
+    }
+  }, { passive: true });
+
+  toTopBtn.addEventListener('click', () => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  });
+
+  const cards = document.querySelectorAll('.project-card');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    cards.forEach((c) => io.observe(c));
+  } else {
+    cards.forEach((c) => c.classList.add('in-view'));
+  }
+</script>
+
+</body>
+</html>

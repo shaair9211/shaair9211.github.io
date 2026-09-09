@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibe Code Artery</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --void:#111111;
+    --panel:#1a1a1a;
+    --panel-2:#161616;
+    --line: rgba(255,255,255,.08);
+    --line-strong: rgba(255,255,255,.16);
+    --text: #f2f1ee;
+    --text-dim: #9a9a9a;
+    --text-faint: #6b6b6b;
+    --red: #780606;
+    --red-bright: #a30d0d;
+    --red-tint: rgba(120,6,6,.14);
+  }
+
+  *{ box-sizing:border-box; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    background: #111111;
+    overflow-x:hidden;
+    margin:0;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .background-texture {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle, rgba(255,255,255,.015) 1px, transparent 1px);
+    background-size: 8px 8px;
+    opacity: .5;
+    pointer-events: none;
+  }
+  .background{
+    position:fixed;
+    inset:0;
+    z-index:-5;
+    pointer-events:none;
+    overflow:hidden;
+  }
+  .background-scroll{
+    position:absolute;
+    inset:0px;
+  }
+
+
+  .back-btn{
+    position: fixed;
+    top: 22px;
+    left: 22px;
+    z-index: 50;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: .85rem;
+    letter-spacing:.02em;
+    color: var(--text-dim);
+    background: rgba(17,17,17,.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line-strong);
+    padding: 9px 14px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .back-btn:hover, .back-btn:focus-visible{
+    color: #fff;
+    border-color: var(--red);
+    background: var(--red-tint);
+  }
+  .back-btn span{ color: var(--red); }
+
+  .to-top{
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    z-index: 50;
+    width: 46px;
+    height: 46px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: rgba(17,17,17,.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    color: var(--text-dim);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease, color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .to-top.visible{
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .to-top:hover, .to-top:focus-visible{
+    color:#fff;
+    border-color: var(--red);
+    background: var(--red-tint);
+  }
+  .to-top svg{ width:18px; height:18px; }
+
+  a:focus-visible, button:focus-visible{
+    outline: 2px solid var(--red);
+    outline-offset: 2px;
+  }
+
+
+  main{
+    position:relative;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 120px 32px 100px;
+  }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: .78rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .eyebrow span{ color: var(--red); }
+
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: clamp(2.1rem, 4.2vw, 3.1rem);
+    margin: 18px 0 20px;
+    letter-spacing: -.01em;
+  }
+
+  .lede{
+    max-width: 640px;
+    color: var(--text-dim);
+    font-size: 1.02rem;
+    line-height: 1.65;
+    margin: 0 0 28px;
+  }
+
+  .laneline{
+    width: 100%;
+    height: 1px;
+    background-image: repeating-linear-gradient(
+      to right,
+      var(--line-strong) 0px, var(--line-strong) 22px,
+      transparent 22px, transparent 40px
+    );
+    margin: 0 0 26px;
+  }
+  .disclaimer{
+    max-width: 640px;
+    color: var(--text-faint);
+    font-size: .88rem;
+    font-style: italic;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .toc{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 12px;
+  }
+  .toc a{
+    font-family:'JetBrains Mono', monospace;
+    font-size: .76rem;
+    letter-spacing: .04em;
+    color: var(--text-dim);
+    border: 1px solid var(--line-strong);
+    padding: 7px 13px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .toc a:hover, .toc a:focus-visible{
+    color:#fff;
+    border-color: var(--red);
+    background: var(--red-tint);
+  }
+
+
+  .project-feature{
+    display:flex;
+    gap: 56px;
+    align-items: center;
+    padding: 60px 0;
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: 90px;
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity .6s ease, transform .5s ease;
+  }
+  .project-feature.in-view{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .project-feature:last-of-type{
+    border-bottom: none;
+  }
+  .project-feature.reverse{
+    flex-direction: row-reverse;
+  }
+
+  .project-media, .project-text{
+    flex: 1 1 50%;
+    min-width: 0;
+  }
+
+  .media-group{
+    display:flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .media-item{
+    position: relative;
+    aspect-ratio: 16 / 10;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--panel-2);
+  }
+  .media-item img, .media-item video{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit: cover;
+    display:block;
+  }
+  .media-fallback{
+    position:absolute;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background: var(--panel-2);
+    font-family:'JetBrains Mono', monospace;
+    font-size: .68rem;
+    color: var(--text-faint);
+    text-align:center;
+    padding: 0 10px;
+  }
+
+  .project-index{
+    font-family:'JetBrains Mono', monospace;
+    font-size: .78rem;
+    letter-spacing: .1em;
+    color: var(--red-bright);
+    margin: 0 0 10px;
+  }
+
+  .project-title{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 1.6rem;
+    margin: 0 0 14px;
+    letter-spacing: -.01em;
+  }
+
+  .project-desc{
+    color: var(--text);
+    font-size: .98rem;
+    line-height: 1.65;
+    margin: 0 0 14px;
+  }
+
+  .project-how{
+    color: var(--text-dim);
+    font-size: .92rem;
+    line-height: 1.65;
+    margin: 0 0 22px;
+  }
+  .project-how strong{
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .tag-row{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size: .66rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #c7c7c7;
+    background: var(--panel-2);
+    border-left: 2px solid var(--red);
+    padding: 5px 9px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  .repo-link{
+    display:inline-flex;
+    align-items:center;
+    gap: 8px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: .82rem;
+    color: var(--text-dim);
+    border: 1px solid var(--line-strong);
+    padding: 9px 14px;
+    border-radius: 4px;
+    text-decoration:none;
+    transition: color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .repo-link:hover, .repo-link:focus-visible{
+    color:#fff;
+    border-color: var(--red);
+    background: var(--red-tint);
+  }
+  .repo-link svg{ width:14px; height:14px; }
+
+  @media (max-width: 860px){
+    .project-feature, .project-feature.reverse{
+      flex-direction: column;
+      gap: 26px;
+      padding: 44px 0;
+    }
+    .project-media, .project-text{
+      flex: 1 1 auto;
+      width: 100%;
+    }
+  }
+
+  footer{
+    margin-top: 20px;
+    padding-top: 22px;
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size: .74rem;
+    color: var(--text-faint);
+    letter-spacing:.03em;
+  }
+  .ending_note{
+    text-align: center;
+    color: var(--text-faint);
+    font-size: .88rem;
+    font-style: italic;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  @media (max-width: 640px){
+    main{ padding: 100px 20px 80px; }
+    .back-btn{ top:16px; left:16px; padding:8px 12px; font-size:.78rem; }
+    .to-top{ bottom:16px; right:16px; width:42px; height:42px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ transition:none !important; animation:none !important; }
+    .project-feature{ opacity:1 !important; transform:none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="background">
+    <div class="background-scroll"></div>
+    <div class="background-texture"></div>
+  </div>
+
+  <a href="index.html#projects" class="back-btn" aria-label="Back to main site" title="Back to main site"><span>../</span></a>
+
+  <button class="to-top" aria-label="Scroll to top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="19" x2="12" y2="5"></line>
+      <polyline points="5 12 12 5 19 12"></polyline>
+    </svg>
+  </button>
+
+  <main>
+
+    <div class="eyebrow"><span>/</span> Vibe Code Artery</div>
+    <h1>Selected Builds</h1>
+    <p class="lede">A collection of programming projects I've developed across different stages of my academic and professional journey. They range from traffic simulation and machine learning to automation tools and data processing, each built to solve a specific problem or explore a particular idea.</p>
+
+    <div class="laneline"></div>
+    <p class="disclaimer">
+      <b>A note on Github:</b> Please excuse the state of the repositories. Not everything is uploaded yet, and what is up there
+       is pretty raw. I'll get around to cleaning everything up eventually and uploading the rest 
+       of it when life gives me some breathing room.
+    </p>
+    <p>&nbsp;</p>
+    <nav class="toc" aria-label="Jump to project">
+      <a href="#project-1">01</a>
+      <a href="#project-2">02</a>
+      <a href="#project-3">03</a>
+      <a href="#project-4">04</a>
+      <a href="#project-5">05</a>
+      <a href="#project-6">06</a>
+    </nav>
+
+    <!-- PROJECT 1 -->
+    <section class="project-feature reverse" id="project-1">
+      <div class="project-media">
+        <div class="media-group">
+          <div class="media-item">
+            <img src="images/artery/1a.png" alt="Vehicle detection model running on traffic footage" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="media-fallback"><span>images/artery-1a.jpg</span></div>
+          </div>
+          <div class="media-item">
+            <img src="images/artery/1b.jpg" alt="[Add alt text for second photo/video]" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="media-fallback"><span>images/artery-1b.jpg</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="project-text">
+        <div class="project-index">01 / 06</div>
+        <h2 class="project-title">Vehicle Detection &amp; Counting</h2>
+        <p class="project-desc">An image processing pipeline that detects and classifies vehicles in traffic footage and keeps a running count as they pass through the frame.</p>
+        <p class="project-how"><strong>How it's done:</strong> built with a YOLO-based detector for frame-by-frame vehicle detection, with a counting line to tally vehicles as they cross a reference point. Tuned specifically for undisciplined traffic conditions as visible in the image.</p>
+        <div class="tag-row">
+          <span class="tag">Python</span>
+          <span class="tag">OpenCV</span>
+          <span class="tag">CVZone</span>
+          <span class="tag">YOLOv8</span>
+        </div>
+        <a class="repo-link" href="https://github.com/shaair9211" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          View on GitHub
+        </a>
+      </div>
+    </section>
+
+
+    <!-- PROJECT 2 -->
+    <section class="project-feature" id="project-2">
+      <div class="project-media">
+        <div class="media-group">
+          <div class="media-item">
+            <img src="images/artery/2a.jpg" alt="Pygame traffic intersection simulation" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="media-fallback"><span>images/artery-2a.jpg</span></div>
+          </div>
+          <div class="media-item">
+            <img src="images/artery/2b.gif" alt="[Add alt text for second photo/video]" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="media-fallback"><span>images/artery-2b.jpg</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="project-text">
+        <div class="project-index">02 / 06</div>
+        <h2 class="project-title">Traffic Intersection Simulation</h2>
+        <p class="project-desc">A 2D simulation of a traffic intersection built in Pygame, used to visualise vehicle flow and signal behaviour.</p>
+        <p class="project-how"><strong>How it's done:</strong> vehicles, lanes and signal phases are modelled as objects updated on a game loop, with spawn rates, movement rules, and signal logic driving how traffic behaves through the intersection. It's built to test fixed, semi-adaptive, and fully adaptive signal control side by side, under identical traffic conditions.</p>
+        <div class="tag-row">
+          <span class="tag">Python</span>
+          <span class="tag">Pygame</span>
+        </div>
+        <a class="repo-link" href="https://github.com/shaair9211" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          View on GitHub
+        </a>
+      </div>
+    </section>
+
+    <!-- PROJECT 3 -->
+    <section class="project-feature reverse" id="project-3">
+      <div class="project-media">
+        <div class="media-group">
+          <div class="media-item">
+            <img src="images/artery/3a.gif" alt="NEAT signal optimization training progress" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="media-fallback"><span>images/artery-4a.jpg</span></div>
+          </div>
+          <div class="media-item">
+            <img src="images/artery/3b.gif" alt="[Add alt text for second photo/video]" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="media-fallback"><span>images/artery-3b.jpg</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="project-text">
+        <div class="project-index">03 / 06</div>
+        <h2 class="project-title">Real-Time Signal Optimization</h2>
+        <p class="project-desc">A scheduling algorithm that optimises real-time traffic signal timing using NEAT (NeuroEvolution of Augmenting Topologies).</p>
+        <p class="project-how"><strong>How it's done:</strong> signal timing strategies are evolved with <a href="https://neat-python.readthedocs.io/" target="_blank" rel="noopener noreferrer" style="color:inherit;">python-neat</a>, with a fitness function scoring each candidate on queue length across simulated scenarios, evolving better-performing signal timing networks over successive generations. Tested against a fixed-time baseline, later generations showed measurably shorter queues and reduced average delay. See the videos alongside this section for a side-by-side look, showing the improvement across generations.</p>
+        <div class="tag-row">
+          <span class="tag">Python</span>
+          <span class="tag">Python-NEAT</span>
+          <span class="tag">Pygame</span>
+        </div>
+        <a class="repo-link" href="https://github.com/shaair9211" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          View on GitHub
+        </a>
+      </div>
+    </section>
+
+    <!-- PROJECT 4 -->
+    <section class="project-feature" id="project-4">
+      <div class="project-media">
+        <div class="media-group">
+          <div class="media-item">
+            <img src="images/artery/4a.gif" alt="Web scraping toolkit output example" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="media-fallback"><span>images/artery-4a.jpg</span></div>
+          </div>
+          <div class="media-item">
+            <img src="images/artery/4b.gif" alt="[Add alt text for second photo/video]" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="media-fallback"><span>images/artery-4b.jpg</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="project-text">
+        <div class="project-index">04 / 06</div>
+        <h2 class="project-title">Web Scraping Toolkit</h2>
+        <p class="project-desc">A collection of scripts for pulling structured data from websites, used both personally and at my previous job to speed up otherwise tedious manual tasks.</p>
+        <p class="project-how"><strong>How it's done:</strong> built using a mix of GUI automation and Playwright, depending on the site and what it needed. The videos alongside show two examples: one pulls architects' info from a website and logs it into Excel, the other scans a council website for relevant documents like SEE reports or architectural plans.</p>
+        <div class="tag-row">
+          <span class="tag">Python</span>
+          <span class="tag">Playwright</span>
+          <span class="tag">PyAutoGUI</span>
+          <span class="tag">Pandas</span>
+          <span class="tag">OpenPyXL</span>
+        </div>
+        <a class="repo-link" href="https://github.com/shaair9211" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          View on GitHub
+        </a>
+      </div>
+    </section>
+
+    <!-- PROJECT 5 -->
+    <section class="project-feature reverse" id="project-5">
+      <div class="project-media">
+        <div class="media-group">
+          <div class="media-item">
+            <img src="images/artery/5a.png" alt="Email extraction from PDFs tool output" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="media-fallback"><span>images/artery-5a.jpg</span></div>
+          </div>
+          <div class="media-item">
+            <img src="images/artery/5b.png" alt="[Add alt text for second photo/video]" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="media-fallback"><span>images/artery-5b.jpg</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="project-text">
+        <div class="project-index">05 / 06</div>
+        <h2 class="project-title">Email Extraction from PDFs</h2>
+        <p class="project-desc">A tool that scans PDF documents and pulls out email addresses automatically, saving the manual work of reading through each file by hand.</p>
+        <p class="project-how"><strong>How it's done:</strong> extracts text from PDFs with PyPDF2 and matches email addresses using a regex pattern, exporting the results to a spreadsheet with pandas.</p>
+        <div class="tag-row">
+          <span class="tag">Python</span>
+          <span class="tag">PyPDF</span>
+          <span class="tag">Pandas</span>
+          <span class="tag">OpenPyXL</span>
+        </div>
+        <a class="repo-link" href="https://github.com/shaair9211" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          View on GitHub
+        </a>
+      </div>
+    </section>
+
+    <!-- PROJECT 6 -->
+    <section class="project-feature" id="project-6">
+      <div class="project-media">
+        <div class="media-group">
+          <div class="media-item">
+            <img src="images/artery/6a.jpg" alt="Screenshot of this portfolio website" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="media-fallback"><span>images/artery-6a.jpg</span></div>
+          </div>
+          <div class="media-item">
+            <img src="images/artery/6b.png" alt="[Add alt text for second photo/video]" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="media-fallback"><span>images/artery-6b.jpg</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="project-text">
+        <div class="project-index">06 / 06</div>
+        <h2 class="project-title">This Website</h2>
+        <p class="project-desc">The site you're looking at right now. Designed and developed from scratch to document my work, projects, interests, and the ongoing journey of becoming the engineer I aspire to be.</p>
+        <p class="project-how"><strong>How it's done:</strong> built with plain HTML, CSS, and JavaScript, no frameworks, so every page stays lightweight, fast, and easy to edit by hand. Every part of the website, from the layout and animations to the interactions, was designed and developed from scratch, adding up to 9,000+ lines of code.</p>
+        <div class="tag-row">
+          <span class="tag">HTML</span>
+          <span class="tag">CSS</span>
+          <span class="tag">JavaScript</span>
+        </div>
+        <a class="repo-link" href="https://github.com/shaair9211" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          View on GitHub
+        </a>
+      </div>
+    </section>
+
+    <footer>New builds added as they're finished.</footer>
+    <p>&nbsp;</p>
+    <p class="ending_note">
+      If you want to see the code for a specific project, or have any questions about it, feel free to reach out to me
+       directly via email or LinkedIn. I'd be happy to share the code and discuss the project with you.
+    </p>
+  </main>
+
+<script>
+  const toTopBtn = document.querySelector('.to-top');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 420) toTopBtn.classList.add('visible');
+    else toTopBtn.classList.remove('visible');
+  }, { passive: true });
+  toTopBtn.addEventListener('click', () => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  });
+
+  const features = document.querySelectorAll('.project-feature');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    features.forEach((f) => io.observe(f));
+  } else {
+    features.forEach((f) => f.classList.add('in-view'));
+  }
+</script>
+
+</body>
+</html>
