@@ -525,6 +525,34 @@ if (beyondFrame && 'IntersectionObserver' in window) {
 
 
 
+// NOT GOOD AT
+////////////////////////////////////////////////////////////////////////////////////
+const ngaWrap = document.querySelector('.nga-wrap');
+if (ngaWrap && 'IntersectionObserver' in window) {
+  ngaWrap.classList.add('will-reveal');
+
+  const ngaObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        ngaObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  ngaObserver.observe(ngaWrap); // was tlWrap
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -638,23 +666,6 @@ if (aboutContent && 'IntersectionObserver' in window) {
   }, { threshold: 0.15 });
 
   aboutObserver.observe(aboutContent);
-}
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-const aboutWrap = document.querySelector('.about-wrap');
-if (aboutWrap && 'IntersectionObserver' in window) {
-  aboutWrap.classList.add('will-reveal');
-
-  const aboutObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        aboutObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.15 });
-
-  aboutObserver.observe(aboutWrap);
 }
 
 
