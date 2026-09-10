@@ -1,0 +1,2389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibes</title>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --void:#111111;
+    --panel:#1a1a1a;
+    --panel-2:#161616;
+    --line: rgba(255,255,255,.08);
+    --line-strong: rgba(255,255,255,.16);
+    --text: #f2f1ee;
+    --text-dim: #9a9a9a;
+    --text-faint: #6b6b6b;
+    --red: #780606;
+    --red-bright: #a30d0d;
+    --red-tint: rgba(120,6,6,.14);
+
+    --tile-w: 4;
+    --tile-h: 5;
+    --tile-unit: 190px;
+    --tile-gap: 4px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    background: #111111;
+    overflow-x:hidden;
+    margin:0;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .background-texture {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle, rgba(255,255,255,.015) 1px, transparent 1px);
+    background-size: 8px 8px;
+    opacity: .5;
+    pointer-events: none;
+  }
+  .background{
+    position:fixed;
+    inset:0;
+    z-index:-5;
+    pointer-events:none;
+    overflow:hidden;
+  }
+  .background-scroll{
+    position:absolute;
+    inset:0px;
+  }
+
+
+  .back-btn{
+    position: fixed;
+    top: 22px;
+    left: 22px;
+    z-index: 50;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: .85rem;
+    letter-spacing:.02em;
+    color: var(--text-dim);
+    background: rgba(17,17,17,.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line-strong);
+    padding: 9px 14px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .back-btn:hover, .back-btn:focus-visible{
+    color: #fff;
+    border-color: var(--red);
+    background: var(--red-tint);
+  }
+  .back-btn span{ color: var(--red); }
+
+  .to-top{
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    z-index: 50;
+    width: 46px;
+    height: 46px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: rgba(17,17,17,.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    color: var(--text-dim);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease, color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .to-top.visible{
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .to-top:hover, .to-top:focus-visible{
+    color:#fff;
+    border-color: var(--red);
+    background: var(--red-tint);
+  }
+  .to-top svg{ width:18px; height:18px; }
+
+  a:focus-visible, button:focus-visible{
+    outline: 2px solid var(--red);
+    outline-offset: 2px;
+  }
+
+
+  main{
+    position:relative;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 120px 32px 100px;
+  }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: .78rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .eyebrow span{ color: var(--red); }
+
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: clamp(2.1rem, 4.2vw, 3.1rem);
+    margin: 18px 0 20px;
+    letter-spacing: -.01em;
+  }
+
+  .lede{
+    max-width: 640px;
+    color: var(--text-dim);
+    font-size: 1.02rem;
+    line-height: 1.65;
+    margin: 0 0 28px;
+  }
+
+  .laneline{
+    width: 100%;
+    height: 1px;
+    background-image: repeating-linear-gradient(
+      to right,
+      var(--line-strong) 0px, var(--line-strong) 22px,
+      transparent 22px, transparent 40px
+    );
+    margin: 0 0 8px;
+  }
+
+
+  .cat-filter{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 28px 0 36px;
+  }
+
+  .cat-btn{
+    font-family:'JetBrains Mono', monospace;
+    font-size: .78rem;
+    letter-spacing: .04em;
+    color: var(--text-dim);
+    background: var(--panel-2);
+    border: 1px solid var(--line-strong);
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .cat-btn:hover{
+    color: var(--text);
+    border-color: var(--line-strong);
+  }
+  .cat-btn[aria-pressed="true"]{
+    color: #fff;
+    background: var(--red-tint);
+    border-color: var(--red);
+  }
+  .cat-btn .count{
+    color: var(--text-faint);
+    margin-left: 6px;
+  }
+  .cat-btn[aria-pressed="true"] .count{
+    color: rgba(255,255,255,.7);
+  }
+
+  .photo.cat-hidden{
+    display: none;
+  }
+
+  @media (max-width: 560px){
+    .cat-filter{ gap: 6px; margin: 22px 0 28px; }
+    .cat-btn{ padding: 7px 13px; font-size: .74rem; }
+  }
+
+
+  .gallery{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--tile-unit), 1fr));
+    grid-auto-flow: dense;
+    grid-auto-rows: calc(var(--tile-unit) * var(--tile-h) / var(--tile-w));
+    gap: var(--tile-gap);
+    margin-top: 54px;
+  }
+
+  .photo{ grid-column: span 1; grid-row: span 1; }
+  .photo.tile-wide{ grid-column: span 2; grid-row: span 1; }
+  .photo.tile-tall{ grid-column: span 1; grid-row: span 2; }
+  .photo.tile-big{  grid-column: span 2; grid-row: span 2; }
+
+  .photo{
+    position: relative;
+    margin: 0;
+    border-radius: 0;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--panel-2);
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity .6s ease, transform .4s ease, background-color .2s ease;
+  }
+  .photo.in-view{
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .photo img{
+    display:block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .photo::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: border-color .2s ease, background-color .2s ease;
+    pointer-events:none;
+  }
+  .photo:hover::after{
+    border-color: rgba(120,6,6,.65);
+    background: rgba(120,6,6,.10);
+  }
+  .photo:focus-visible{
+    outline: 2px solid var(--red);
+    outline-offset: 3px;
+  }
+
+  .fallback{
+    display:none;
+    position: absolute;
+    inset: 0;
+    align-items:center;
+    justify-content:center;
+    background: var(--panel-2);
+    font-family:'JetBrains Mono', monospace;
+    font-size: .68rem;
+    color: var(--text-faint);
+    text-align:center;
+    padding: 0 10px;
+  }
+
+  .photo figcaption{
+    position:absolute;
+    text-align:center;
+    left:0; right:0; bottom:0;
+    padding: 24px 10px 8px;
+    background: linear-gradient(to top, rgba(0,0,0,.8), transparent);
+    color: #e9e9e9;
+    font-family:'Inter', sans-serif;
+    font-size: .76rem;
+    line-height: 1.4;
+    pointer-events:none;
+  }
+
+  .photo[data-video] .play-badge{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none;
+  }
+  .photo[data-video] .play-badge svg{
+    width: 44px;
+    height: 44px;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,.65));
+  }
+
+  @media (max-width: 900px){
+    :root{ --tile-unit: 150px; }
+  }
+  @media (max-width: 560px){
+    :root{ --tile-unit: 130px; --tile-gap: 3px; }
+    .photo.tile-wide, .photo.tile-big{ grid-column: span 2; }
+  }
+
+
+  footer{
+    margin-top: 70px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size: .74rem;
+    color: var(--text-faint);
+    letter-spacing:.03em;
+  }
+
+
+  .lightbox{
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(8,8,8,.95);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    opacity: 0;
+    pointer-events:none;
+    transition: opacity .3s ease;
+  }
+  .lightbox.open{
+    opacity: 1;
+    pointer-events:auto;
+  }
+
+  .lb-content{
+    max-width: 90vw;
+    max-height: 86vh;
+    margin: 0;
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+  }
+  .lb-content img{
+    max-width: 90vw;
+    max-height: 78vh;
+    object-fit: contain;
+    display:block;
+    border-radius: 2px;
+  }
+  .lb-content video{
+    max-width: 90vw;
+    max-height: 78vh;
+    display:none;
+    border-radius: 2px;
+    background:#000;
+  }
+  .lb-content figcaption{
+    margin-top: 14px;
+    color: var(--text-dim);
+    font-family:'Inter', sans-serif;
+    font-size: .88rem;
+    font-style: italic;
+    text-align:center;
+    max-width: 70vw;
+  }
+
+  .lb-btn{
+    position: fixed;
+    z-index: 310;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width: 44px;
+    height: 44px;
+    background: rgba(17,17,17,.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-size: 1.3rem;
+    line-height:1;
+    cursor:pointer;
+    transition: color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .lb-btn:hover, .lb-btn:focus-visible{
+    color:#fff;
+    border-color: var(--red);
+    background: var(--red-tint);
+  }
+  .lb-close{ top: 22px; right: 22px; }
+  .lb-prev{ left: 22px; top: 50%; transform: translateY(-50%); }
+  .lb-next{ right: 22px; top: 50%; transform: translateY(-50%); }
+
+  .lb-counter{
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family:'JetBrains Mono', monospace;
+    font-size: .72rem;
+    letter-spacing: .06em;
+    color: var(--text-faint);
+    z-index: 310;
+  }
+
+  @media (max-width: 640px){
+    main{ padding: 100px 20px 80px; }
+    .back-btn{ top:16px; left:16px; padding:8px 12px; font-size:.78rem; }
+    .to-top{ bottom:16px; right:16px; width:42px; height:42px; }
+    .lb-btn{ width:38px; height:38px; font-size:1.1rem; }
+    .lb-close{ top:14px; right:14px; }
+    .lb-prev{ left:14px; }
+    .lb-next{ right:14px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; animation:none !important; }
+    .photo{ opacity:1 !important; transform:none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="background">
+    <div class="background-scroll"></div>
+    <div class="background-texture"></div>
+  </div>
+
+  <a href="index.html#traffic-engineering" class="back-btn" aria-label="Back to main site" title="Back to main site"><span>../</span></a>
+
+  <button class="to-top" aria-label="Scroll to top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="19" x2="12" y2="5"></line>
+      <polyline points="5 12 12 5 19 12"></polyline>
+    </svg>
+  </button>
+
+  <main>
+
+    <div class="eyebrow"><span>/</span> Vibes</div>
+    <h1>Off the Clock</h1>
+    <p class="lede">
+      Desk shots, field trips, and the occasional bit of nonsense.
+      The less formal side of the job.
+    </p>
+
+    <div class="laneline"></div>
+
+    <section class="gallery">
+
+      <!-- PHOTO 1 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-1-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-1.jpg" alt="First site walk before the works started" loading="eager" decoding="async" fetchpriority="high"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-1.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 2 -->
+      <figure class="photo tile-big" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-2.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-2-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-2-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 3 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-3-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-3.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-3.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 4 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-4-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-4.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-4.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 5 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-5-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-5.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-5.jpg</span></div>
+        <figcaption>Another casualty of the office AC wars. 🥀</figcaption>
+      </figure>
+
+      <!-- PHOTO 6 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-6-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-6.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-6.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 7 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-7-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-7.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-7.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 8 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-8.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-8-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-8-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 9 -->
+      <figure class="photo tile-big" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-9-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-9.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-9.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 10 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-10-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-10.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-10.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 11 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-11-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-11.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-11.jpg</span></div>
+        <figcaption>your's truly, leading the charge 💪🏻</figcaption>
+      </figure>
+
+            <!-- VIDEO 12 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-12.mp4" data-category="trauma">
+        <img src="images/vibes/vibes-12-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-12-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 13 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-13-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-13.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-13.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 14 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-14.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-14-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-14-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 15 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-15.mp4" data-category="trauma">
+        <img src="images/vibes/vibes-15-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-15-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 16 -->
+      <figure class="photo tile-big" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-16-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-16.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-16.jpg</span></div>
+        <figcaption>poor boiiiiii kept him waiting too 😪</figcaption>
+      </figure>
+
+      <!-- PHOTO 17 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-17-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-17.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-17.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 18 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-18-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-18.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-18.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 19 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-19-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-19.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-19.jpg</span></div>
+        <figcaption>trauma dump meetup</figcaption>
+      </figure>
+
+      <!-- PHOTO 20 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-20-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-20.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-20.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 21 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-21-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-21.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-21.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 22 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-22.mp4" data-category="sky">
+        <img src="images/vibes/vibes-22-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-22-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 23 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-23.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-23-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-23-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 24 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-24.mp4" data-category="trauma">
+        <img src="images/vibes/vibes-24-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-24-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 25 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-25-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-25.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-25.jpg</span></div>
+        <figcaption>partner in crime</figcaption>
+      </figure>
+
+      <!-- PHOTO 26 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-26-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-26.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-26.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 27 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-27-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-27.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-27.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 28 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-28-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-28.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-28.jpg</span></div>
+        <figcaption>💓</figcaption>
+      </figure>
+
+      <!-- PHOTO 29 -->
+      <figure class="photo tile-big" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-29-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-29.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-29.jpg</span></div>
+        <figcaption>to all my haters</figcaption>
+      </figure>
+
+            <!-- VIDEO 30 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-30.mp4" data-category="trauma">
+        <img src="images/vibes/vibes-30-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-30-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 31 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-31-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-31.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-31.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 32 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-32-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-32.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-32.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 33 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-33-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-33.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-33.jpg</span></div>
+        <figcaption>AEA (Anti-establishment Alliance) weekly tactical briefing</figcaption>
+      </figure>
+
+      <!-- PHOTO 34 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-34-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-34.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-34.jpg</span></div>
+        <figcaption>either bad wiring or management's exit strategy for me</figcaption>
+      </figure>
+
+            <!-- VIDEO 35 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-35.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-35-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-35-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 36 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-36.mp4" data-category="trauma">
+        <img src="images/vibes/vibes-36-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-36-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 37 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-37-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-37.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-37.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 38 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-38-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-38.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-38.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 39 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-39-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-39.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-39.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 40 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-40-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-40.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-40.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 41 -->
+      <figure class="photo tile-big" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-41-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-41.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-41.jpg</span></div>
+        <figcaption>majestic ✨</figcaption>
+      </figure>
+
+      <!-- PHOTO 42 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-42-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-42.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-42.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 43 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-43.mp4" data-category="sky">
+        <img src="images/vibes/vibes-43-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-43-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 44 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-44.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-44-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-44-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 45 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-45-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-45.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-45.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 46 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-46-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-46.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-46.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 47 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-47-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-47.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-47.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 48 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-48-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-48.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-48.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 49 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-49-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-49.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-49.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 50 -->
+      <figure class="photo tile-big" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-50-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-50.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-50.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 51 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-51-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-51.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-51.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 52 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-52-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-52.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-52.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 53 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-53-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-53.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-53.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 54 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-54-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-54.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-54.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 55 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-55.mp4" data-category="sky">
+        <img src="images/vibes/vibes-55-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-55-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 56 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-56.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-56-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-56-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 57 -->
+      <figure class="photo tile-big" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-57-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-57.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-57.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 58 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-58-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-58.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-58.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 59 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-59-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-59.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-59.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 60 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-60-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-60.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-60.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 61 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-61-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-61.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-61.jpg</span></div>
+        <figcaption>field trip</figcaption>
+      </figure>
+
+            <!-- VIDEO 62 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-62.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-62-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-62-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 63 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-63-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-63.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-63.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 64 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-64-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-64.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-64.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 65 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-65-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-65.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-65.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 66 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-66-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-66.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-66.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 67 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-67.mp4" data-category="sky">
+        <img src="images/vibes/vibes-67-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-67-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 68 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-68.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-68-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-68-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 69 -->
+      <figure class="photo tile-big" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-69-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-69.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-69.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 70 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-70-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-70.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-70.jpg</span></div>
+        <figcaption>🤒💊💉</figcaption>
+      </figure>
+
+      <!-- PHOTO 71 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-71-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-71.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-71.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 72 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-72-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-72.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-72.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 73 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-73-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-73.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-73.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 74 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-74.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-74-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-74-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 75 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-75-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-75.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-75.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 76 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-76.mp4" data-category="sky">
+        <img src="images/vibes/vibes-76-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-76-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 77 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-77.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-77-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-77-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 78 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-78.mp4" data-category="trauma">
+        <img src="images/vibes/vibes-78-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-78-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 79 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-79-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-79.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-79.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 80 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-80-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-80.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-80.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 81 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-81.mp4" data-category="trauma">
+        <img src="images/vibes/vibes-81-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-81-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 82 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-82-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-82.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-82.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 83 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-83-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-83.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-83.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 84 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-84-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-84.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-84.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 85 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-85-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-85.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-85.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 86 -->
+      <figure class="photo tile-big" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-86-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-86.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-86.jpg</span></div>
+        <figcaption>disgusting...</figcaption>
+      </figure>
+
+      <!-- PHOTO 87 -->
+      <figure class="photo tile-big" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-87-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-87.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-87.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 88 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-88-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-88.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-88.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 89 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-89-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-89.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-89.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 90 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-90-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-90.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-90.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 91 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-91-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-91.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-91.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 92 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-92-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-92.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-92.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 93 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-93-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-93.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-93.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 94 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-94-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-94.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-94.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 95 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-95-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-95.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-95.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 96 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-96.mp4" data-category="trauma">
+        <img src="images/vibes/vibes-96-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-96-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 97 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-97-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-97.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-97.jpg</span></div>
+        <figcaption>mentos zindagi 😎</figcaption>
+      </figure>
+
+      <!-- PHOTO 98 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-98-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-98.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-98.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 99 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-99-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-99.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-99.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 100 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-100-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-100.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-100.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 101 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-101-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-101.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-101.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 102 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-102-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-102.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-102.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 103 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-103-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-103.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-103.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 104 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-104-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-104.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-104.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 105 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-105-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-105.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-105.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 106 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-106-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-106.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-106.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 107 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-107-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-107.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-107.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 108 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-108-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-108.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-108.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 109 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-109-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-109.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-109.jpg</span></div>
+        <figcaption>life rn</figcaption>
+      </figure>
+
+            <!-- VIDEO 110 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-110.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-110-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-110-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 111 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-111.mp4" data-category="trauma">
+        <img src="images/vibes/vibes-111-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-111-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 112 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-112.mp4" data-category="sky">
+        <img src="images/vibes/vibes-112-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-112-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 113 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-113-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-113.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-113.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 114 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-114-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-114.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-114.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 115 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-115-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-115.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-115.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 116 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-116-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-116.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-116.jpg</span></div>
+        <figcaption>morning ritual</figcaption>
+      </figure>
+
+      <!-- PHOTO 117 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-117-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-117.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-117.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 118 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-118-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-118.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-118.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 119 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-119-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-119.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-119.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 120 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-120-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-120.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-120.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 121 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-121.mp4" data-category="sky">
+        <img src="images/vibes/vibes-121-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-121-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 122 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-122-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-122.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-122.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 123 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-123-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-123.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-123.jpg</span></div>
+        <figcaption>Proof that I gave it everything (and my shirt paid the price)</figcaption>
+      </figure>
+
+      <!-- PHOTO 124 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-124-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-124.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-124.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 125 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-125.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-125-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-125-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 126 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-126-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-126.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-126.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 127 -->
+      <figure class="photo tile-big" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-127-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-127.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-127.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 128 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-128.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-128-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-128-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 129 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-129-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-129.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-129.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 130 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-130-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-130.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-130.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 131 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-131-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-131.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-131.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 132 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-132-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-132.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-132.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 133 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-133-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-133.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-133.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 134 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-134.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-134-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-134-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 135 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-135.mp4" data-category="trauma">
+        <img src="images/vibes/vibes-135-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-135-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 136 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-136-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-136.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-136.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 137 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-137-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-137.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-137.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 138 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-138-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-138.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-138.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 139 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-139.mp4" data-category="sky">
+        <img src="images/vibes/vibes-139-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-139-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 140 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-140-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-140.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-140.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 141 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-141.mp4" data-category="trauma">
+        <img src="images/vibes/vibes-141-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-141-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 142 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-142-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-142.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-142.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 143 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-143.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-143-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-143-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 144 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-144-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-144.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-144.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 145 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-145-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-145.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-145.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 146 -->
+      <figure class="photo tile-big" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-146-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-146.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-146.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 147 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-147-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-147.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-147.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 148 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-148.mp4" data-category="sky">
+        <img src="images/vibes/vibes-148-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-148-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 149 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-149-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-149.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-149.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 150 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-150.mp4" data-category="trauma">
+        <img src="images/vibes/vibes-150-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-150-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 151 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-151-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-151.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-151.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 152 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-152-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-152.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-152.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 153 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-153-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-153.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-153.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 154 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-154.mp4" data-category="sky">
+        <img src="images/vibes/vibes-154-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-154-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 155 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-155-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-155.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-155.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 156 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-156-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-156.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-156.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 157 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-157.mp4" data-category="sky">
+        <img src="images/vibes/vibes-157-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-157-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 158 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-158.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-158-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-158-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 159 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-159-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-159.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-159.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 160 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-160-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-160.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-160.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 161 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-161-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-161.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-161.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 162 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-162-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-162.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-162.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 163 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-163-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-163.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-163.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 164 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-164-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-164.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-164.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 165 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-165-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-165.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-165.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 166 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-166-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-166.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-166.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 167 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-167.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-167-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-167-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+        <figcaption>that one cry baby after losing</figcaption>
+      </figure>
+
+      <!-- PHOTO 168 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-168-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-168.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-168.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 169 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-169.mp4" data-category="sky">
+        <img src="images/vibes/vibes-169-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-169-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 170 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-170.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-170-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-170-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 171 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-171-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-171.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-171.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 172 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-172-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-172.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-172.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 173 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-173.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-173-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-173-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 174 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-174.mp4" data-category="trauma">
+        <img src="images/vibes/vibes-174-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-174-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 175 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-175-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-175.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-175.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 176 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-176-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-176.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-176.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 177 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-177-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-177.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-177.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 178 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-178.mp4" data-category="sky">
+        <img src="images/vibes/vibes-178-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-178-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- VIDEO 179 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-179.mp4" data-category="coffee">
+        <img src="images/vibes/vibes-179-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-179-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+      <!-- PHOTO 180 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-180-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-180.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-180.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 181 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-181.mp4" data-category="sky">
+        <img src="images/vibes/vibes-181-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-181-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+        <figcaption>and just like that....</figcaption>
+      </figure>
+
+      <!-- PHOTO 182 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-182-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-182.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-182.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 183 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-183-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-183.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-183.jpg</span></div>
+      </figure>
+
+      <!-- PHOTO 184 -->
+      <figure class="photo" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-184-full.jpg" data-category="sky">
+        <img src="images/vibes/vibes-184.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-184.jpg</span></div>
+      </figure>
+
+            <!-- PHOTO 185 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-185-full.jpg" data-category="coffee">
+        <img src="images/vibes/vibes-185.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-185.jpg</span></div>
+      </figure>
+
+            <!-- PHOTO 186 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-186-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-186.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-186.jpg</span></div>
+      </figure>
+
+            <!-- PHOTO 187 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-187-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-187.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-187.jpg</span></div>
+      </figure>
+
+            <!-- PHOTO 188 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-188-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-188.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-188.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 189 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-189.mp]4" data-category="sky">
+        <img src="images/vibes/vibes-189-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-189-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+      </figure>
+
+            <!-- PHOTO 190 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-190-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-190.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-190.jpg</span></div>
+      </figure>
+
+            <!-- VIDEO 191 -->
+      <figure class="photo tile-tall" tabindex="0" role="button" aria-label="Open video"
+              data-video="images/vibes/vibes-191.mp4" data-category="sky">
+        <img src="images/vibes/vibes-191-poster.jpg" alt="[Add a caption]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-191-poster.jpg</span></div>
+        <span class="play-badge" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,.45)"/><path d="M19 15l16 9-16 9z" fill="#fff"/></svg>
+        </span>
+        <figcaption>unemployment maxxxing</figcaption>
+      </figure>
+
+            <!-- PHOTO 192 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-192-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-192.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-192.jpg</span></div>
+      </figure>
+
+            <!-- PHOTO 193 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-193-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-193.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-193.jpg</span></div>
+      </figure>
+
+            <!-- PHOTO 194 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-194-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-194.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-194.jpg</span></div>
+      </figure>
+
+            <!-- PHOTO 195 -->
+      <figure class="photo tile-wide" tabindex="0" role="button" aria-label="Open photo"
+              data-full="images/vibes/vibes-195-full.jpg" data-category="trauma">
+        <img src="images/vibes/vibes-195.jpg" alt="[Add descriptive alt text]" loading="lazy" decoding="async"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="fallback"><span>images/vibes/vibes-195.jpg</span></div>
+      </figure>
+
+    </section>
+
+    <footer>More added as they happen.</footer>
+
+  </main>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <button class="lb-btn lb-close" aria-label="Close">✕</button>
+    <button class="lb-btn lb-prev" aria-label="Previous photo">‹</button>
+    <button class="lb-btn lb-next" aria-label="Next photo">›</button>
+    <figure class="lb-content">
+      <img id="lb-img" src="" alt="">
+      <video id="lb-video" controls loop playsinline preload="metadata"></video>
+      <figcaption id="lb-caption"></figcaption>
+    </figure>
+    <div class="lb-counter" id="lb-counter" aria-live="polite"></div>
+  </div>
+
+<script>
+
+  const toTopBtn = document.querySelector('.to-top');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 420) toTopBtn.classList.add('visible');
+    else toTopBtn.classList.remove('visible');
+  }, { passive: true });
+  toTopBtn.addEventListener('click', () => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  });
+
+  const catButtons = Array.from(document.querySelectorAll('.cat-btn'));
+  const allPhotosForFilter = Array.from(document.querySelectorAll('.gallery .photo'));
+
+  catButtons.forEach((btn) => {
+    const filter = btn.dataset.filter;
+    const count = filter === 'all'
+      ? allPhotosForFilter.length
+      : allPhotosForFilter.filter((p) => (p.dataset.category || '').split(' ').includes(filter)).length;
+    const label = document.createElement('span');
+    label.className = 'count';
+    label.textContent = `(${count})`;
+    btn.appendChild(label);
+  });
+
+  function applyFilter(filter){
+    allPhotosForFilter.forEach((p) => {
+      const cats = (p.dataset.category || '').split(' ');
+      const show = filter === 'all' || cats.includes(filter);
+      p.classList.toggle('cat-hidden', !show);
+    });
+  }
+
+  catButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      catButtons.forEach((b) => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+      applyFilter(btn.dataset.filter);
+    });
+  });
+
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    allPhotosForFilter.forEach((p) => io.observe(p));
+  } else {
+    allPhotosForFilter.forEach((p) => p.classList.add('in-view'));
+  }
+
+  const gallery = document.querySelector('.gallery');
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lb-img');
+  const lbVideo = document.getElementById('lb-video');
+  const lbCaption = document.getElementById('lb-caption');
+  const lbCounter = document.getElementById('lb-counter');
+  let current = 0;
+  let lastFocused = null;
+
+
+  function visiblePhotos(){
+    return allPhotosForFilter.filter((p) => !p.classList.contains('cat-hidden'));
+  }
+
+  function stopVideo(){
+    lbVideo.pause();
+    lbVideo.removeAttribute('src');
+    lbVideo.load();
+    lbVideo.style.display = 'none';
+  }
+
+  function showPhoto(i){
+    const list = visiblePhotos();
+    current = (i + list.length) % list.length;
+    const fig = list[current];
+    const img = fig.querySelector('img');
+    const cap = fig.querySelector('figcaption');
+    const videoSrc = fig.dataset.video;
+
+    if (videoSrc) {
+      lbImg.style.display = 'none';
+      lbImg.src = '';
+      lbVideo.pause();
+      lbVideo.poster = img.src;
+      lbVideo.src = videoSrc;
+      lbVideo.style.display = 'block';
+      lbVideo.load();
+
+      const playPromise = lbVideo.play();
+      if (playPromise && playPromise.catch) playPromise.catch(() => {});
+    } else {
+      stopVideo();
+      lbImg.src = fig.dataset.full || img.src;
+      lbImg.alt = img.alt || '';
+      lbImg.style.display = 'block';
+    }
+
+    if (cap && cap.textContent.trim()){
+      lbCaption.textContent = cap.textContent;
+      lbCaption.style.display = 'block';
+    } else {
+      lbCaption.textContent = '';
+      lbCaption.style.display = 'none';
+    }
+    lbCounter.textContent = (current + 1) + ' / ' + list.length;
+  }
+
+  function openLightbox(i){
+    lastFocused = document.activeElement;
+    showPhoto(i);
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    lb.querySelector('.lb-close').focus();
+  }
+
+  function closeLightbox(){
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+    stopVideo();
+    if (lastFocused) lastFocused.focus();
+  }
+
+  gallery.addEventListener('click', (e) => {
+    const fig = e.target.closest('.photo');
+    if (!fig) return;
+    openLightbox(visiblePhotos().indexOf(fig));
+  });
+
+  gallery.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const fig = e.target.closest('.photo');
+    if (!fig) return;
+    e.preventDefault();
+    openLightbox(visiblePhotos().indexOf(fig));
+  });
+
+  document.querySelector('.lb-close').addEventListener('click', closeLightbox);
+  document.querySelector('.lb-prev').addEventListener('click', () => showPhoto(current - 1));
+  document.querySelector('.lb-next').addEventListener('click', () => showPhoto(current + 1));
+
+  lb.addEventListener('click', (e) => { if (e.target === lb) closeLightbox(); });
+
+  document.addEventListener('keydown', (e) => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (document.activeElement === lbVideo) return;
+    if (e.key === 'ArrowLeft') showPhoto(current - 1);
+    if (e.key === 'ArrowRight') showPhoto(current + 1);
+  });
+
+  let touchStartX = 0;
+  lb.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+  lb.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    if (Math.abs(dx) > 50) {
+      dx > 0 ? showPhoto(current - 1) : showPhoto(current + 1);
+    }
+  }, { passive: true });
+</script>
+</body>
+</html>
