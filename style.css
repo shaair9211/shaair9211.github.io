@@ -3179,9 +3179,9 @@ h3 {
   font-weight: 500;
   color: #f4f2ed;
 }
-.about-copy h3 span{
+/* .about-copy h3 span{
   font-family: "Caveat", cursive;
-}
+} */
 .about-text {
   max-width: 670px;
 }
